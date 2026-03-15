@@ -9,90 +9,90 @@ using TaleWorlds.MountAndBlade;
 
 namespace PickupMeleeWeapons
 {
-    [HarmonyPatch(typeof(HumanAIComponent))]
-    public class PickupMeleeWeaponsComponent
-    {
-        [HarmonyPatch("DisablePickUpForAgentIfNeeded")]
-        public static void Postfix(ref bool ____disablePickUpForAgent, Agent ___Agent)
-        {
-            if (!___Agent.HasMount && PickupMeleeWeaponsHelper.HasLostMeleeWeapon(___Agent))
-            {
-                ____disablePickUpForAgent = false;
-            }
-        }
+	[HarmonyPatch(typeof(HumanAIComponent))]
+	public class PickupMeleeWeaponsComponent
+	{
+		[HarmonyPatch("DisablePickUpForAgentIfNeeded")]
+		public static void Postfix(ref bool ____disablePickUpForAgent, Agent ___Agent)
+		{
+			if (!___Agent.HasMount && PickupMeleeWeaponsHelper.HasLostMeleeWeapon(___Agent))
+			{
+				____disablePickUpForAgent = false;
+			}
+		}
 
-        [HarmonyTranspiler]
-        [HarmonyPatch("ItemPickupTick")]
-        private static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions)
-        {
-            List<CodeInstruction> codes = instructions.ToList();
-            int startIndex = 0, endIndex = 0;
+		[HarmonyTranspiler]
+		[HarmonyPatch("ItemPickupTick")]
+		private static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions)
+		{
+			List<CodeInstruction> codes = instructions.ToList();
+			int startIndex = 0, endIndex = 0;
 
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (codes[i].operand is MethodInfo method)
-                {
-                    if (method == AccessTools.Method(typeof(Agent), "GetTargetAgent"))
-                    {
-                        startIndex = i - 2;
-                    }
-                    else if (method == AccessTools.Method(typeof(Agent), "GetLastTargetVisibilityState"))
-                    {
-                        endIndex = i + 2;
-                    }
-                }
-            }
+			for (int i = 0; i < codes.Count; i++)
+			{
+				if (codes[i].operand is MethodInfo method)
+				{
+					if (method == AccessTools.Method(typeof(Agent), "GetTargetAgent"))
+					{
+						startIndex = i - 2;
+					}
+					else if (method == AccessTools.Method(typeof(Agent), "GetLastTargetVisibilityState"))
+					{
+						endIndex = i + 2;
+					}
+				}
+			}
 
-            // Remove the checks for target agent.
-            codes.RemoveRange(startIndex, endIndex - startIndex + 1);
+			// Remove the checks for target agent.
+			codes.RemoveRange(startIndex, endIndex - startIndex + 1);
 
-            return codes;
-        }
+			return codes;
+		}
 
-        [HarmonyTranspiler]
-        [HarmonyPatch("SelectPickableItem")]
-        private static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator il)
-        {
-            List<CodeInstruction> codes = instructions.ToList(), codesToInsert = new List<CodeInstruction>();
-            Label label = il.DefineLabel();
-            int index = 0, startIndex = 0, endIndex = 0;
+		[HarmonyTranspiler]
+		[HarmonyPatch("SelectPickableItem")]
+		private static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator il)
+		{
+			List<CodeInstruction> codes = instructions.ToList(), codesToInsert = new List<CodeInstruction>();
+			Label label = il.DefineLabel();
+			int index = 0, startIndex = 0, endIndex = 0;
 
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (codes[i].operand is MethodInfo method)
-                {
-                    if (method == AccessTools.PropertyGetter(typeof(Vec3), "Length"))
-                    {
-                        startIndex = i - 3;
-                    }
-                    else if (method == AccessTools.Method(typeof(Agent), "GetMaximumForwardUnlimitedSpeed"))
-                    {
-                        endIndex = i + 3;
-                    }
-                }
-            }
+			for (int i = 0; i < codes.Count; i++)
+			{
+				if (codes[i].operand is MethodInfo method)
+				{
+					if (method == AccessTools.PropertyGetter(typeof(Vec3), "Length"))
+					{
+						startIndex = i - 3;
+					}
+					else if (method == AccessTools.Method(typeof(Agent), "GetMaximumForwardUnlimitedSpeed"))
+					{
+						endIndex = i + 3;
+					}
+				}
+			}
 
-            // Remove the checks for target agent.
-            codes.RemoveRange(startIndex, endIndex - startIndex + 1);
+			// Remove the checks for target agent.
+			codes.RemoveRange(startIndex, endIndex - startIndex + 1);
 
-            for (int i = 0; i < codes.Count; i++)
-            {
-                if (codes[i].operand is MethodInfo method && method == AccessTools.Method(typeof(SpawnedItemEntity), "IsQuiverAndNotEmpty"))
-                {
-                    codes[i + 2].labels.Add(label);
-                    index = i + 1;
-                }
-            }
+			for (int i = 0; i < codes.Count; i++)
+			{
+				if (codes[i].operand is MethodInfo method && method == AccessTools.Method(typeof(SpawnedItemEntity), "IsQuiverAndNotEmpty"))
+				{
+					codes[i + 2].labels.Add(label);
+					index = i + 1;
+				}
+			}
 
-            // Make melee weapons pickable.
-            codesToInsert.Add(new CodeInstruction(OpCodes.Brtrue_S, label));
-            codesToInsert.Add(new CodeInstruction(OpCodes.Ldloc_S, 9));
-            codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PickupMeleeWeaponsComponent), "IsMeleeWeapon", new Type[] { typeof(MissionWeapon) })));
-            codes.InsertRange(index, codesToInsert);
+			// Make melee weapons pickable.
+			codesToInsert.Add(new CodeInstruction(OpCodes.Brtrue_S, label));
+			codesToInsert.Add(new CodeInstruction(OpCodes.Ldloc_S, 9));
+			codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PickupMeleeWeaponsComponent), "IsMeleeWeapon", new Type[] { typeof(MissionWeapon) })));
+			codes.InsertRange(index, codesToInsert);
 
-            return codes;
-        }
+			return codes;
+		}
 
-        private static bool IsMeleeWeapon(MissionWeapon weapon) => weapon.Item.PrimaryWeapon.IsMeleeWeapon;
-    }
+		private static bool IsMeleeWeapon(MissionWeapon weapon) => weapon.Item.PrimaryWeapon.IsMeleeWeapon;
+	}
 }

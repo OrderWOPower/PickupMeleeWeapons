@@ -56,7 +56,7 @@
     <Compile Include="PickupMeleeWeaponsComponent.cs" />
     <Compile Include="PickupMeleeWeaponsHelper.cs" />
     <Compile Include="PickupMeleeWeaponsModel.cs" />
-    <Compile Include="PickupMeleeWeaponsPostureLogic.cs" />
+    <Compile Include="PickupMeleeWeaponsStanceLogic.cs" />
     <Compile Include="PickupMeleeWeaponsSubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
