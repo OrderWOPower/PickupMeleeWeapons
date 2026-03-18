@@ -28,8 +28,8 @@ namespace PickupMeleeWeapons
 			// Check whether RBM is loaded.
 			if (_typeofStanceLogic != null)
 			{
-				_harmony.Patch(AccessTools.Method(AccessTools.Inner(_typeofStanceLogic, "CreateMeleeBlowPatch"), "TryToDropWeapon"), transpiler: new HarmonyMethod(AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Transpiler")));
 				_harmony.Patch(AccessTools.Method(_typeofStanceLogic, "forceTiredAnimation"), prefix: new HarmonyMethod(AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Prefix")));
+				_harmony.Patch(AccessTools.Method(AccessTools.Inner(_typeofStanceLogic, "CreateMeleeBlowPatch"), "TryToDropWeapon"), transpiler: new HarmonyMethod(AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Transpiler")));
 			}
 		}
 
@@ -37,8 +37,8 @@ namespace PickupMeleeWeapons
 		{
 			if (_typeofStanceLogic != null)
 			{
-				_harmony.Unpatch(AccessTools.Method(AccessTools.Inner(_typeofStanceLogic, "CreateMeleeBlowPatch"), "TryToDropWeapon"), AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Transpiler"));
 				_harmony.Unpatch(AccessTools.Method(_typeofStanceLogic, "forceTiredAnimation"), AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Prefix"));
+				_harmony.Unpatch(AccessTools.Method(AccessTools.Inner(_typeofStanceLogic, "CreateMeleeBlowPatch"), "TryToDropWeapon"), AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Transpiler"));
 			}
 		}
 	}
