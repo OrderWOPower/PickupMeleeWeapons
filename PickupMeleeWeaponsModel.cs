@@ -14,7 +14,7 @@ namespace PickupMeleeWeapons
 		{
 			if (PickupMeleeWeaponsHelper.HadSameTypeOfMeleeWeaponOnSpawn(agent, item.WeaponCopy.Item.PrimaryWeapon.WeaponClass))
 			{
-				// Make agents prefer the same classes of weapons they spawned with when picking up melee weapons.
+				// Make agents prefer the same types of weapons they spawned with when picking up melee weapons.
 				return 120f;
 			}
 			else if (item.WeaponCopy.Item.PrimaryWeapon.IsMeleeWeapon)
