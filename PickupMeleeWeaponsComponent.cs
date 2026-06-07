@@ -110,15 +110,6 @@ namespace PickupMeleeWeapons
 			// Remove the checks for target agent.
 			codes.RemoveRange(startIndex, endIndex - startIndex + 1);
 
-			for (int i = 0; i < codes.Count; i++)
-			{
-				if (codes[i].opcode == OpCodes.Blt)
-				{
-					// Make the for loop run only once.
-					codes[i - 1].opcode = OpCodes.Ldc_I4_1;
-				}
-			}
-
 			return codes;
 		}
 
