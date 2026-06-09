@@ -56,7 +56,7 @@ namespace PickupMeleeWeapons
 		private static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator il)
 		{
 			List<CodeInstruction> codes = instructions.ToList(), codesToInsert = new List<CodeInstruction>();
-			Label label = il.DefineLabel();
+			Label label = il.DefineLabel(), label2 = il.DefineLabel();
 			int index = 0, startIndex = 0, endIndex = 0;
 
 			for (int i = 0; i < codes.Count; i++)
@@ -67,9 +67,20 @@ namespace PickupMeleeWeapons
 					endIndex = i;
 					index = i + 1;
 				}
+
+				if (codes[i].opcode == OpCodes.Add)
+				{
+					codes[i - 2].labels.Add(label);
+				}
 			}
 
+			// Execute only if the entity is valid.
+			codesToInsert.Add(new CodeInstruction(OpCodes.Ldloca_S, 6));
+			codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(WeakGameEntity), "IsValid")));
+			codesToInsert.Add(new CodeInstruction(OpCodes.Brfalse_S, label));
+			codes.InsertRange(index + 1, codesToInsert);
 			// Get the closest pickable entity to the agent instead of the last pickable entity.
+			codesToInsert.Clear();
 			codesToInsert.Add(new CodeInstruction(OpCodes.Ldarg_0));
 			codesToInsert.Add(new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(AgentComponent), "Agent")));
 			codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PickupMeleeWeaponsComponent), "GetClosestPickableEntity", new Type[] { typeof(WeakGameEntity[]), typeof(Agent) })));
@@ -80,14 +91,14 @@ namespace PickupMeleeWeapons
 			{
 				if (codes[i].operand is MethodInfo method && method == AccessTools.Method(typeof(SpawnedItemEntity), "IsQuiverAndNotEmpty"))
 				{
-					codes[i + 2].labels.Add(label);
+					codes[i + 2].labels.Add(label2);
 					index = i + 1;
 				}
 			}
 
 			// Make melee weapons pickable.
 			codesToInsert.Clear();
-			codesToInsert.Add(new CodeInstruction(OpCodes.Brtrue_S, label));
+			codesToInsert.Add(new CodeInstruction(OpCodes.Brtrue_S, label2));
 			codesToInsert.Add(new CodeInstruction(OpCodes.Ldloca_S, 9));
 			codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PickupMeleeWeaponsComponent), "IsMeleeWeapon", new Type[] { typeof(MissionWeapon) })));
 			codes.InsertRange(index, codesToInsert);
