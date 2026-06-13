@@ -4,8 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
-using TaleWorlds.Core;
-using TaleWorlds.Engine;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 
@@ -61,44 +59,15 @@ namespace PickupMeleeWeapons
 
 			for (int i = 0; i < codes.Count; i++)
 			{
-				if (codes[i].operand is Type type && type == typeof(WeakGameEntity))
-				{
-					startIndex = i - 1;
-					endIndex = i;
-					index = i + 1;
-				}
-
-				if (codes[i].opcode == OpCodes.Add)
-				{
-					codes[i - 2].labels.Add(label);
-				}
-			}
-
-			// Execute only if the entity is valid.
-			codesToInsert.Add(new CodeInstruction(OpCodes.Ldloca_S, 6));
-			codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.PropertyGetter(typeof(WeakGameEntity), "IsValid")));
-			codesToInsert.Add(new CodeInstruction(OpCodes.Brfalse_S, label));
-			codes.InsertRange(index + 1, codesToInsert);
-			// Get the closest pickable entity to the agent instead of the last pickable entity.
-			codesToInsert.Clear();
-			codesToInsert.Add(new CodeInstruction(OpCodes.Ldarg_0));
-			codesToInsert.Add(new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(AgentComponent), "Agent")));
-			codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PickupMeleeWeaponsComponent), "GetClosestPickableEntity", new Type[] { typeof(WeakGameEntity[]), typeof(Agent) })));
-			codes.InsertRange(index, codesToInsert);
-			codes.RemoveRange(startIndex, endIndex - startIndex + 1);
-
-			for (int i = 0; i < codes.Count; i++)
-			{
 				if (codes[i].operand is MethodInfo method && method == AccessTools.Method(typeof(SpawnedItemEntity), "IsQuiverAndNotEmpty"))
 				{
-					codes[i + 2].labels.Add(label2);
+					codes[i + 2].labels.Add(label);
 					index = i + 1;
 				}
 			}
 
 			// Make melee weapons pickable.
-			codesToInsert.Clear();
-			codesToInsert.Add(new CodeInstruction(OpCodes.Brtrue_S, label2));
+			codesToInsert.Add(new CodeInstruction(OpCodes.Brtrue_S, label));
 			codesToInsert.Add(new CodeInstruction(OpCodes.Ldloca_S, 9));
 			codesToInsert.Add(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PickupMeleeWeaponsComponent), "IsMeleeWeapon", new Type[] { typeof(MissionWeapon) })));
 			codes.InsertRange(index, codesToInsert);
@@ -121,10 +90,20 @@ namespace PickupMeleeWeapons
 			// Remove the checks for target agent.
 			codes.RemoveRange(startIndex, endIndex - startIndex + 1);
 
+			for (int i = 0; i < codes.Count; i++)
+			{
+				if (codes[i].opcode == OpCodes.Ret)
+				{
+					codes[i - 1].labels.Add(label2);
+					index = i - 8;
+				}
+			}
+
+			// Get the first pickable entity instead of the last pickable entity.
+			codes.Insert(index, new CodeInstruction(OpCodes.Br_S, label2));
+
 			return codes;
 		}
-
-		private static WeakGameEntity GetClosestPickableEntity(WeakGameEntity[] entities, Agent agent) => entities.MinBy(entity => agent.Position.DistanceSquared(entity.GlobalPosition));
 
 		private static bool IsMeleeWeapon(MissionWeapon weapon) => weapon.Item.PrimaryWeapon.IsMeleeWeapon;
 	}
