@@ -99,7 +99,7 @@ namespace PickupMeleeWeapons
 				}
 			}
 
-			// Get the first pickable entity instead of the last pickable entity.
+			// Get the first pickable entity instead of the last one.
 			codes.Insert(index, new CodeInstruction(OpCodes.Br_S, label2));
 
 			return codes;
