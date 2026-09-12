@@ -33,6 +33,8 @@ namespace PickupMeleeWeapons
 			}
 		}
 
+		public override void OnBeforeMissionBehaviorInitialize(Mission mission) => mission.AddMissionBehavior(new PickupMeleeWeaponsMissionBehavior());
+
 		public override void OnGameEnd(Game game)
 		{
 			if (_typeofStanceLogic != null)

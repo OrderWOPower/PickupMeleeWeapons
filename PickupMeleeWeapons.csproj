@@ -45,6 +45,9 @@
     <Reference Include="TaleWorlds.Core">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.Core.dll</HintPath>
     </Reference>
+    <Reference Include="TaleWorlds.DotNet">
+      <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.DotNet.dll</HintPath>
+    </Reference>
     <Reference Include="TaleWorlds.Library">
       <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\bin\Win64_Shipping_Client\TaleWorlds.Library.dll</HintPath>
     </Reference>
@@ -55,6 +58,8 @@
   <ItemGroup>
     <Compile Include="PickupMeleeWeaponsComponent.cs" />
     <Compile Include="PickupMeleeWeaponsHelper.cs" />
+    <Compile Include="PickupMeleeWeaponsManager.cs" />
+    <Compile Include="PickupMeleeWeaponsMissionBehavior.cs" />
     <Compile Include="PickupMeleeWeaponsModel.cs" />
     <Compile Include="PickupMeleeWeaponsStanceLogic.cs" />
     <Compile Include="PickupMeleeWeaponsSubModule.cs" />
