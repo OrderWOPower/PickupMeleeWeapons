@@ -110,7 +110,7 @@ namespace PickupMeleeWeapons
 		{
 			if (PickupMeleeWeaponsHelper.HasLostMeleeWeapon(___Agent))
 			{
-				// Ensure that agents are in their respective queue before they can search for a melee weapon.
+				// Ensure that agents are in the respective queue before they can search for a melee weapon.
 				return MathF.Floor(Mission.Current.CurrentTime) % 2 == 0 ? PickupMeleeWeaponsManager.Current.ItemPickupQueueEven.Contains(___Agent) : PickupMeleeWeaponsManager.Current.ItemPickupQueueOdd.Contains(___Agent);
 			}
 

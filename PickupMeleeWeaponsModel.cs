@@ -37,10 +37,17 @@ namespace PickupMeleeWeapons
 
 		public override bool IsItemAvailableForAgent(SpawnedItemEntity item, Agent agent, EquipmentIndex slotToPickUp)
 		{
-			if (item.WeaponCopy.Item.PrimaryWeapon.IsMeleeWeapon)
+			MissionWeapon weapon = item.WeaponCopy;
+
+			if (weapon.Item.PrimaryWeapon.ItemUsage == "banner")
+			{
+				// Ensure that agents do not pick up a banner from a different team.
+				return agent.Equipment[slotToPickUp].IsEmpty && weapon.Banner != null && weapon.Banner.IsContentsSameWith(agent.Team?.Banner);
+			}
+			else if (weapon.Item.PrimaryWeapon.IsMeleeWeapon)
 			{
 				// Ensure that agents do not pick up another melee weapon that shares the same type as a weapon they already have.
-				return agent.Equipment[slotToPickUp].IsEmpty && PickupMeleeWeaponsHelper.HasLostMeleeWeapon(agent) && !PickupMeleeWeaponsHelper.HasSameTypeOfMeleeWeaponCurrently(agent, item.WeaponCopy.Item.ItemType);
+				return agent.Equipment[slotToPickUp].IsEmpty && PickupMeleeWeaponsHelper.HasLostMeleeWeapon(agent) && !PickupMeleeWeaponsHelper.HasSameTypeOfMeleeWeaponCurrently(agent, weapon.Item.ItemType);
 			}
 
 			return _model.IsItemAvailableForAgent(item, agent, slotToPickUp);
