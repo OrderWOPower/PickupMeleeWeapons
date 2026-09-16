@@ -46,8 +46,16 @@ namespace PickupMeleeWeapons
 			}
 			else if (weapon.Item.PrimaryWeapon.IsMeleeWeapon)
 			{
-				// Ensure that agents do not pick up another melee weapon that shares the same type as a weapon they already have.
-				return agent.Equipment[slotToPickUp].IsEmpty && PickupMeleeWeaponsHelper.HasLostMeleeWeapon(agent) && !PickupMeleeWeaponsHelper.HasSameTypeOfMeleeWeaponCurrently(agent, weapon.Item.ItemType);
+				if (PickupMeleeWeaponsHelper.IsWieldingBanner(agent) && weapon.Item.PrimaryWeapon.IsTwoHanded)
+				{
+					// Ensure that agents do not pick up a two-handed melee weapon if they are wielding a banner.
+					return false;
+				}
+				else
+				{
+					// Ensure that agents do not pick up another melee weapon that shares the same type as a weapon they already have.
+					return agent.Equipment[slotToPickUp].IsEmpty && PickupMeleeWeaponsHelper.HasLostMeleeWeapon(agent) && !PickupMeleeWeaponsHelper.HasSameTypeOfMeleeWeaponCurrently(agent, weapon.Item.ItemType);
+				}
 			}
 
 			return _model.IsItemAvailableForAgent(item, agent, slotToPickUp);

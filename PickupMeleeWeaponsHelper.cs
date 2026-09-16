@@ -1,4 +1,6 @@
-﻿using TaleWorlds.Core;
+﻿using System;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 
 namespace PickupMeleeWeapons
@@ -53,6 +55,20 @@ namespace PickupMeleeWeapons
 			}
 
 			return difference > 0;
+		}
+
+		public static bool IsWieldingBanner(Agent agent)
+		{
+			try
+			{
+				return !agent.WieldedOffhandWeapon.IsEmpty && agent.WieldedOffhandWeapon.Item.PrimaryWeapon.ItemUsage == "banner";
+			}
+			catch (Exception ex)
+			{
+				InformationManager.DisplayMessage(new InformationMessage(ex.ToString()));
+
+				return false;
+			}
 		}
 	}
 }
