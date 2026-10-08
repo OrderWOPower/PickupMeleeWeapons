@@ -11,7 +11,7 @@ namespace PickupMeleeWeapons
 	public class PickupMeleeWeaponsSubModule : MBSubModuleBase
 	{
 		private Harmony _harmony;
-		private Type _typeofStanceLogic;
+		private Type _typeofAgentAi;
 
 		protected override void OnSubModuleLoad()
 		{
@@ -23,13 +23,12 @@ namespace PickupMeleeWeapons
 		{
 			gameStarterObject.AddModel(new PickupMeleeWeaponsModel((ItemPickupModel)gameStarterObject.Models.Last(model => model is ItemPickupModel)));
 
-			_typeofStanceLogic = AccessTools.TypeByName("RBMAI.StanceLogic");
+			_typeofAgentAi = AccessTools.TypeByName("RBMAI.AgentAi");
 
 			// Check whether RBM is loaded.
-			if (_typeofStanceLogic != null)
+			if (_typeofAgentAi != null)
 			{
-				_harmony.Patch(AccessTools.Method(_typeofStanceLogic, "forceTiredAnimation"), prefix: new HarmonyMethod(AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Prefix")));
-				_harmony.Patch(AccessTools.Method(AccessTools.Inner(_typeofStanceLogic, "CreateMeleeBlowPatch"), "TryToDropWeapon"), transpiler: new HarmonyMethod(AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Transpiler")));
+				_harmony.Patch(AccessTools.Method(AccessTools.Inner(_typeofAgentAi, "OnTickPatch"), "TrySeekMeleeWeapon"), prefix: new HarmonyMethod(AccessTools.Method(typeof(PickupMeleeWeaponsAgentAi), "Prefix")));
 			}
 		}
 
@@ -37,10 +36,9 @@ namespace PickupMeleeWeapons
 
 		public override void OnGameEnd(Game game)
 		{
-			if (_typeofStanceLogic != null)
+			if (_typeofAgentAi != null)
 			{
-				_harmony.Unpatch(AccessTools.Method(_typeofStanceLogic, "forceTiredAnimation"), AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Prefix"));
-				_harmony.Unpatch(AccessTools.Method(AccessTools.Inner(_typeofStanceLogic, "CreateMeleeBlowPatch"), "TryToDropWeapon"), AccessTools.Method(typeof(PickupMeleeWeaponsStanceLogic), "Transpiler"));
+				_harmony.Unpatch(AccessTools.Method(_typeofAgentAi, "TrySeekMeleeWeapon"), AccessTools.Method(typeof(PickupMeleeWeaponsAgentAi), "Prefix"));
 			}
 		}
 	}
