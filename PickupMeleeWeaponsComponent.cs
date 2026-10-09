@@ -111,6 +111,7 @@ namespace PickupMeleeWeapons
 			if (PickupMeleeWeaponsHelper.HasLostMeleeWeapon(___Agent))
 			{
 				// Ensure that agents are in the respective queue before they can search for a melee weapon.
+				// Process even-indexed agents on even seconds and odd-indexed agents on odd seconds.
 				return MathF.Floor(Mission.Current.CurrentTime) % 2 == 0 ? PickupMeleeWeaponsManager.Current.ItemPickupQueueEven.Contains(___Agent) : PickupMeleeWeaponsManager.Current.ItemPickupQueueOdd.Contains(___Agent);
 			}
 

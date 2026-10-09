@@ -38,7 +38,7 @@ namespace PickupMeleeWeapons
 		{
 			if (_typeofAgentAi != null)
 			{
-				_harmony.Unpatch(AccessTools.Method(_typeofAgentAi, "TrySeekMeleeWeapon"), AccessTools.Method(typeof(PickupMeleeWeaponsAgentAi), "Prefix"));
+				_harmony.Unpatch(AccessTools.Method(AccessTools.Inner(_typeofAgentAi, "OnTickPatch"), "TrySeekMeleeWeapon"), AccessTools.Method(typeof(PickupMeleeWeaponsAgentAi), "Prefix"));
 			}
 		}
 	}
